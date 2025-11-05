@@ -1,0 +1,27 @@
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+services:
+  prometheus:
+    image: docker.io/prom/prometheus:v3.6.0
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml #/data/compose/2/config/prometheus/prometheus.yaml
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=2GB
+    ports:
+      - 9090:9090
+    volumes:
+      - ./config/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+  grafana:
+    image: docker.io/grafana/grafana-oss:12.1.1
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
